@@ -19,7 +19,7 @@ public:
         { // everything is ok to entry
             if (inService < PRIORITY) // entry priority
             {
-                isFreeServiceTrack = true;
+                isFreeServiceTrack = false;
             }
             else // escape priority
             {
@@ -34,18 +34,21 @@ public:
                 }
             }
         }
+        else
+        {
+            entry.wait();
+        }
         // now i have service track
         sleep();
         ++inService;
         leaveServiceTrack();
-        }
 
     } // entryToService()
 
     void escapeTheService()
     {
         if (isFreeServiceTrack)
-        { // everything is ok to entry
+        { // everything is ok to escape
             if (inService >= PRIORITY) // escape priority
             {
                 isFreeServiceTrack = false;
@@ -62,6 +65,10 @@ public:
                     isFreeServiceTrack = false;
                 }
             }
+        }
+        else
+        {
+            escape.wait();
         }
         // now i have service track
         sleep();
