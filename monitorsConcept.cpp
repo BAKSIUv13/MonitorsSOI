@@ -1,8 +1,8 @@
 // Monitors concept
 // Bartlomiej Kulik
-// 18 April 2018
+// 20 April 2018
 
-class cars : public monitor
+class Cars : public Monitor
 {
 private:
 
@@ -40,7 +40,7 @@ public:
         leaveServiceTrack();
         }
 
-    }
+    } // entryToService()
 
     void escapeTheService()
     {
@@ -67,48 +67,41 @@ public:
         sleep();
         --inService;
         leaveServiceTrack();
-    }
+    } // escapeTheService()
 
 private:
 
-    void leaveServiceTrack() // no monitor function
+    void leaveServiceTrack() // no monitor function!
     {
-        if (entry.isEmpty() && escape.isEmpty()) // nobody want to drive
+        if (inService < PRIORITY)
         {
-            isFreeServiceTrack = true;
-            // without any signal()
+            if (!entry.isEmpty())
+            {
+                entry.signal();
+            }
+            else if (!escape.isEmpty())
+            {
+                escape.signal();
+            }
+            else // entry.isEmpty() && escape.isEntry() is true
+            {
+                isFreeServiceTrack = true;
+            }
         }
         else
         {
-            if (inService < PRIORITY)
+            if (!escape.isEmpty())
             {
-                if (!entry.isEmpty())
-                {
-                    entry.signal();
-                }
-                else if (!escape.isEmpty())
-                {
-                    escape.signal();
-                }
-                else
-                {
-                    isFreeServiceTrack = true;
-                }
+                escape.signal();
+            }
+            else if (!entry.isEmpty())
+            {
+                entry.signal();
             }
             else
             {
-                if (!escape.isEmpty())
-                {
-                    escape.signal();
-                }
-                else if (!entry.isEmpty())
-                {
-                    entry.signal();
-                }
-                else
-                {
-                    isFreeServiceTrack = true;
-                }
+                isFreeServiceTrack = true;
             }
-    }
+        }
+    } // leaveServiceTrack()
 };
