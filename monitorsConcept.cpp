@@ -2,19 +2,23 @@
 // Bartlomiej Kulik
 // 20 April 2018
 
+#include "monitor.h"
+
 class Cars : public Monitor
 {
 private:
 
     const int PRIORITY, CARS, LAPS, SERVICES;
     int inService;
-    condition entry, escape;
     bool isFreeServiceTrack;
+    Condition entry, escape;
 
 public:
 
-    void entryToService()
+    void entryToService() // monitor function
     {
+        enter();
+
         if (isFreeServiceTrack && inService < SERVICES)
         { // everything is ok to entry
             if (inService < PRIORITY) // entry priority
@@ -43,10 +47,13 @@ public:
         ++inService;
         leaveServiceTrack();
 
+        leave();
     } // entryToService()
 
-    void escapeTheService()
+    void escapeTheService() // monitor function
     {
+        enter()
+
         if (isFreeServiceTrack)
         { // everything is ok to escape
             if (inService >= PRIORITY) // escape priority
@@ -74,6 +81,8 @@ public:
         sleep();
         --inService;
         leaveServiceTrack();
+
+        leave();
     } // escapeTheService()
 
 private:
