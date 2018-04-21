@@ -1,45 +1,47 @@
 // Monitors cars solution
 // Bartlomiej Kulik
-// 20 April 2018
+// 21 April 2018
 
 #ifndef __monitorsCarsSolution
 #define __monitorsCarsSolution
 
 #include "monitor.h"
 #include <unistd.h>
+#include <iostream>
 
 class Cars : public Monitor
 {
 private:
 
     const unsigned int PRIORITY, CARS, LAPS, SERVICES;
-    int inService;
+    unsigned int inService;
     bool isFreeServiceTrack;
     Condition entry, escape;
 
 public:
 
     Cars(const unsigned int& priority, const unsigned int& cars,
-        const unsigned int& laps, const unsigned int& services) :
-        PRIORITY(priority), CARS(cars), LAPS(laps), SERVICES(services), inService(0), isFreeServiceTrack(true)
+    const unsigned int& laps, const unsigned int& services) :
+    PRIORITY(priority), CARS(cars), LAPS(laps), SERVICES(services),
+    inService(0), isFreeServiceTrack(true)
     {}
 
     void bolid(const unsigned int& id, const unsigned int& lapTime,
-              const unsigned int& serviceTime,
-              const unsigned int& serviceTrackTime)
+    const unsigned int& serviceTime, const unsigned int& serviceTrackTime)
     {
         for (unsigned int i = 0; i < LAPS; ++i)
         {
             drive(id, lapTime);
-            entryToService(id, serviceTrackTime);
+            entryToService(id, serviceTrackTime); // monitor
             serviceOperations(id, serviceTime);
-            escapeTheService(id, serviceTrackTime);
+            escapeTheService(id, serviceTrackTime); // monitor
         }
     }
 
 private:
 
-    void entryToService(const unsigned int& id) // monitor function
+    void entryToService(const unsigned int& id,
+    const unsigned int& serviceTrackTime) // monitor function
     {
         enter(); // take the critical section
 
@@ -68,13 +70,14 @@ private:
         }
         // now I have the service track
         ++inService;
-        drive(2);
-        leaveServiceTrack();
+        drive(id, serviceTrackTime);
+        leaveServiceTrack(id);
 
         leave(); // release the critical section
     } // entryToService()
 
-    void escapeTheService(const unsigned int& id) // monitor function
+    void escapeTheService(const unsigned int& id,
+    const unsigned int& serviceTrackTime) // monitor function
     {
         enter(); // take the critical section
 
@@ -102,9 +105,9 @@ private:
                 escape.wait();
             }
         // now i have the service track
-        drive(2);
+        drive(id, serviceTrackTime);
         --inService;
-        leaveServiceTrack();
+        leaveServiceTrack(id);
 
         leave(); // release the critical section
     } // escapeTheService()
@@ -150,7 +153,9 @@ private:
 
     void serviceOperations(const unsigned int& id, const unsigned int& time)
     {
+        std::cout << "serviceOperations: " << id << std::endl;
         sleep(time);
+
     }
 
 };
